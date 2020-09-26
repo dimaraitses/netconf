@@ -3,12 +3,14 @@
 #
 #!/usr/bin/env python
 import logging
+import xmltodict
 
 from ncclient import manager
 from ncclient.xml_ import *
 
 
 def connect(host, port, user, password):
+    print("Opening connection to ",host,":",port)
     conn = manager.connect(host=host,
                            port=port,
                            username=user,
@@ -18,14 +20,19 @@ def connect(host, port, user, password):
                            hostkey_verify=False)
     return(conn)
 
+def disconnect(conn):
+    print("Closing connection.")
+    conn.close_session()
+
+
 def get_lldp(conn):
     filter  = """
 		<lldp
 			xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ethernet-lldp-oper">
 		</lldp>
     """
-    print(conn.get(("subtree",filter)))
-    conn.close_session()
+    result = conn.get(("subtree",filter))
+    return(result)
 
 def get_lldp_summ(conn):
     filter  = """
@@ -42,8 +49,9 @@ def get_lldp_summ(conn):
                  </nodes>
 		</lldp>
     """
-    print(conn.get(("subtree",filter)))
-    conn.close_session()
+    result = conn.get(("subtree",filter))
+    return(result)
+    
 
 def get_interface(conn,interface):
     filter = """
@@ -97,9 +105,13 @@ def set_ipv4_address(conn,interface,address,mask):
     conn.edit_config(target="candidate",config=config)
     conn.commit()
 
-if __name__ == '__main__':
+def main():
     LOG_FORMAT = '%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s'
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=LOG_FORMAT)
 
-    m=connect('P-1', 830, 'ccie', 'ccie')
+    m=connect('100.64.9.21', 830, 'cs', 'cs')
     get_lldp_summ(m)
+    disconnect(m)
+
+if __name__ == '__main__':
+    main()
