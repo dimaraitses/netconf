@@ -24,6 +24,9 @@ def disconnect(conn):
     print("Closing connection.")
     conn.close_session()
 
+def commit_changes(conn):
+    print("Committing changes..")
+    conn.commit()
 
 def get_lldp(conn):
     filter  = """
@@ -35,6 +38,7 @@ def get_lldp(conn):
     return(result)
 
 def get_lldp_summ(conn):
+    print("Get LLDP summary data")
     filter  = """
                 <lldp
                         xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ethernet-lldp-oper">
@@ -52,6 +56,18 @@ def get_lldp_summ(conn):
     result = conn.get(("subtree",filter))
     return(result)
     
+def set_if_desc_from_lldp(conn):
+    result=get_lldp_summ(conn).xml
+    print("Starting to work")
+    print(type(result))
+    dict_lldp=xmltodict.parse(result)
+    for i in (dict_lldp["rpc-reply"]["data"]["lldp"]["nodes"]["node"]["neighbors"]["summaries"]["summary"]):
+        print("Found neighbor ",i["device-id"]," on interface ",i["interface-name"])
+        print("Setting port description.")
+        description=("Link to "+i["device-id"]+" "+i["lldp-neighbor"]["port-id-detail"])
+        set_description(conn,i["interface-name"],description)
+        print("next neighbor\n")
+    print("Done")
 
 def get_interface(conn,interface):
     filter = """
@@ -77,9 +93,10 @@ def set_description(conn,interface,description):
          </interface-configurations>
         </config>
     """.format(interface,description)
-    print(config)
+    
+    print("Setting port description ..")
     conn.edit_config(target="candidate",config=config)
-    conn.commit()
+    
 
 def set_ipv4_address(conn,interface,address,mask):
     config = """
@@ -107,10 +124,11 @@ def set_ipv4_address(conn,interface,address,mask):
 
 def main():
     LOG_FORMAT = '%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s'
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=LOG_FORMAT)
+    logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
 
     m=connect('100.64.9.21', 830, 'cs', 'cs')
-    get_lldp_summ(m)
+    set_if_desc_from_lldp(m)
+    commit_changes(m)
     disconnect(m)
 
 if __name__ == '__main__':
