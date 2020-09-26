@@ -1,5 +1,5 @@
 #
-# working with IOS_XR interfaces
+# working with IOS_XR  LLDP
 #
 #!/usr/bin/env python
 import logging
@@ -20,20 +20,13 @@ def connect(host, port, user, password):
 
 def get_interfaces(conn):
     filter  = """
-		<interfaces xmlns="http://openconfig.net/yang/interfaces">
-			<interface>
-			</interface>
-		</interfaces>
+
     """
     print(conn.get(("subtree",filter)))
     conn.close_session()
 
 def get_interface(conn,interface):
     filter = """
-                <interfaces xmlns="http://openconfig.net/yang/interfaces">
-                        <interface>
-				<name>{0}</name>
-                        </interface>
                 </interfaces>
     """.format(interface)
     print(conn.get(("subtree",filter)))
