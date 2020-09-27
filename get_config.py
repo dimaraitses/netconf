@@ -31,5 +31,5 @@ if __name__ == '__main__':
     LOG_FORMAT = '%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s'
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=LOG_FORMAT)
 
-    connect('P-1', 830, 'ccie', 'ccie')
+    connect('100.64.9.21', 830, 'cs', 'cs')
 
