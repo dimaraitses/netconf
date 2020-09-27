@@ -85,7 +85,7 @@ def create_loopback(conn,index):
 	 <interfaces
 			xmlns="http://openconfig.net/yang/interfaces">
 			<interface operation="create">
-				<name>Loopback0</name>
+				<name>Loopback{0}</name>
 				<config>
 					<name>Loopback{0}</name>
 					<type
@@ -100,7 +100,56 @@ def create_loopback(conn,index):
     """.format(index)
     print(config)
     conn.edit_config(target="candidate",config=config)
-    
+
+def create_sub(conn,interface,sub,vlan):
+    config = """
+	      <config>
+	      <interfaces
+			xmlns="http://openconfig.net/yang/interfaces">
+          <interface operation="create">
+				<name>{0}</name>
+				<config>
+					<name>{0}</name>
+					<type
+						xmlns:idx="urn:ietf:params:xml:ns:yang:iana-if-type">idx:ethernetCsmacd
+					</type>
+					<enabled>false</enabled>
+				</config>
+				<ethernet
+					xmlns="http://openconfig.net/yang/interfaces/ethernet">
+					<config>
+						<auto-negotiate>false</auto-negotiate>
+					</config>
+				</ethernet>
+				<subinterfaces>
+					<subinterface>
+						<index>{1}</index>
+						<config>
+							<index>{1}</index>
+							<name>{0}.{1}</name>
+							<enabled>true</enabled>
+						</config>
+						<ipv6
+							xmlns="http://openconfig.net/yang/interfaces/ip">
+							<config>
+								<enabled>false</enabled>
+							</config>
+						</ipv6>
+						<vlan
+							xmlns="http://openconfig.net/yang/vlan">
+							<config>
+								<vlan-id>{2}</vlan-id>
+							</config>
+						</vlan>
+					</subinterface>
+				</subinterfaces>
+			</interface>
+			</interfaces>
+			</config>
+            """.format(interface,sub,vlan)
+    print(config)
+    conn.edit_config(target="candidate",config=config)
+
 def set_if_ipv4_addr(conn,interface,address,mask):
     config="""
     <config>
@@ -131,9 +180,5 @@ if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
 
     m=connect('100.64.9.21', 830, 'cs', 'cs')
-    for i in range(21,24):
-        interface="Loopback"+str(i)
-        address="10.0.0."+str(i)
-        print(interface,"->",address)
-        set_if_ipv4_addr(m,interface,address,"255.255.255.255")
+    create_sub(m,"GigabitEthernet0/0/0/7","200","200")
     m.commit()
