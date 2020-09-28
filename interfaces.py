@@ -101,6 +101,32 @@ def create_loopback(conn,index):
     print(config)
     conn.edit_config(target="candidate",config=config)
 
+def delete_loopback(conn,index):
+    config = """
+	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+	 <interfaces
+			xmlns="http://openconfig.net/yang/interfaces">
+			<interface xc:operation="delete">
+				<name>Loopback{0}</name>
+				<config>
+					<name>Loopback{0}</name>
+					<type
+						xmlns:idx="urn:ietf:params:xml:ns:yang:iana-if-type">idx:softwareLoopback
+					</type>
+					<enabled>true</enabled>
+				</config>
+				
+			</interface>
+            </interfaces>
+    </config>
+    """.format(index)
+    print(config)
+    try:
+        conn.edit_config(target="candidate",config=config)
+        print("Loopback",index," deleted")
+    except Exception as e:
+        print("Counld not delete interface due to ",e)
+
 def create_sub(conn,interface,sub,vlan):
     config = """
 	      <config>
@@ -149,7 +175,7 @@ def create_sub(conn,interface,sub,vlan):
             """.format(interface,sub,vlan)
     print(config)
     conn.edit_config(target="candidate",config=config)
-
+    
 def set_if_ipv4_addr(conn,interface,address,mask):
     config="""
     <config>
@@ -180,5 +206,5 @@ if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
 
     m=connect('100.64.9.21', 830, 'cs', 'cs')
-    create_sub(m,"GigabitEthernet0/0/0/7","200","200")
+    delete_loopback(m,59)
     m.commit()
