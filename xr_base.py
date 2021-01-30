@@ -11,14 +11,15 @@ from ncclient.xml_ import *
 
 
 def xr_connect(host, port, user, password):
-    conn = manager.connect(host=host,
+    try:
+       conn = manager.connect(host=host,
                            port=port,
                            username=user,
                            password=password,
                            timeout=60,
                            device_params={'name': 'iosxr'},
-                           hostkey_verify=False)
-    try:
+                           hostkey_verify=False) 
+       print("Connected to ",host)
        return(conn)
     except Exception as e:
         print("Connection to ",host,":",port," failed due to ",e)

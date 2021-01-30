@@ -10,15 +10,6 @@ from ncclient import manager
 from ncclient.xml_ import *
 
 
-def connect(host, port, user, password):
-    conn = manager.connect(host=host,
-                           port=port,
-                           username=user,
-                           password=password,
-                           timeout=60,
-                           device_params={'name': 'iosxr'},
-                           hostkey_verify=False)
-    return(conn)
 
 def get_interfaces(conn):
     filter  = """
@@ -28,7 +19,6 @@ def get_interfaces(conn):
 		</interfaces>
     """
     print(conn.get(("subtree",filter)))
-    conn.close_session()
 
 def get_interface(conn,interface):
     filter = """
@@ -247,11 +237,3 @@ def set_if_ipv4_addr(conn,interface,address,mask):
     """.format(interface,address,mask)
     print(config)
     conn.edit_config(target="candidate",config=config)
-
-if __name__ == '__main__':
-    LOG_FORMAT = '%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s'
-    logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
-
-    m=connect('100.64.9.21', 830, 'cs', 'cs')
-    delete_sub(m,"GigabitEthernet0/0/0/7",100)
-    m.commit()
