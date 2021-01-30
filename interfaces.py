@@ -175,6 +175,53 @@ def create_sub(conn,interface,sub,vlan):
             """.format(interface,sub,vlan)
     print(config)
     conn.edit_config(target="candidate",config=config)
+
+def delete_sub(conn,interface,sub):
+    config = """
+	      <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+	      <interfaces
+			xmlns="http://openconfig.net/yang/interfaces">
+          <interface operation="create">
+				<name>{0}</name>
+				<config>
+					<name>{0}</name>
+					<type
+						xmlns:idx="urn:ietf:params:xml:ns:yang:iana-if-type">idx:ethernetCsmacd
+					</type>
+					<enabled>false</enabled>
+				</config>
+				<ethernet
+					xmlns="http://openconfig.net/yang/interfaces/ethernet">
+					<config>
+						<auto-negotiate>false</auto-negotiate>
+					</config>
+				</ethernet>
+				<subinterfaces>
+					<subinterface xc:operation="delete">
+						<index>{1}</index>
+						<config>
+							<index>{1}</index>
+							<name>{0}.{1}</name>
+							<enabled>true</enabled>
+						</config>
+						<ipv6
+							xmlns="http://openconfig.net/yang/interfaces/ip">
+							<config>
+								<enabled>false</enabled>
+							</config>
+						</ipv6>
+						
+					</subinterface>
+				</subinterfaces>
+			</interface>
+			</interfaces>
+			</config>
+            """.format(interface,sub)
+    try:
+        conn.edit_config(target="candidate",config=config)
+        print("sub interface deleted")
+    except Exception as e:
+        print("sub interface deletion failed due to ",e)
     
 def set_if_ipv4_addr(conn,interface,address,mask):
     config="""
@@ -206,5 +253,5 @@ if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
 
     m=connect('100.64.9.21', 830, 'cs', 'cs')
-    delete_loopback(m,59)
+    delete_sub(m,"GigabitEthernet0/0/0/7",100)
     m.commit()

@@ -93,17 +93,26 @@ def delete_ntp_server(conn,address):
     except Exception as e:
         print("Failed to delete NTP server due to ",e)
 
+def ntp_status(conn):
+    filter = """
+    <ntp xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ip-ntp-oper">
+    </ntp>
+    """
+    try:
+        #print(config)
+        res = conn.get(("subtree",filter)).xml
+        print(res)
+    except Exception as e:
+        print("Failed to get ntp inforation due to  ",e)
+
 def main():
     LOG_FORMAT = '%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s'
     logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
     
     conn=xr_base.xr_connect('100.64.9.21', 830, 'cs', 'cs')
-    set_hostname(conn,"LAB-P-1")
-    for i in range(10,20):
-        srv="12.0.0."+str(i)
-        delete_ntp_server(conn,srv)
+    ntp_status(conn)
 
-    xr_base.xr_commit(conn)
+    #xr_base.xr_commit(conn)
     xr_base.xr_disconnect(conn)
 
 if __name__ == '__main__':
