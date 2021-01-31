@@ -273,6 +273,7 @@ def set_if_ipv4_addr_eitf(conn,interface,address,mask):
 
 def del_if_ipv4_addr_eitf(conn,interface,address,mask):
 	# verified on IOS-XR 6.1.3 on Jan 31, 2021
+	# note using xmlns:xc namespace and operation="delete"
 	config="""
 	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
 	<interfaces xmlns="http://openconfig.net/yang/interfaces" xc:operation="delete">
