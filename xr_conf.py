@@ -13,7 +13,8 @@ def main():
     
     conn=xr_base.xr_connect('XR1-AUTO', 830, 'ccie', 'ccieauto')
     #xr_interfaces.get_interface(conn,'GigabitEthernet0/0/0/0')
-    xr_interfaces.set_if_ipv6_addr_eitf(conn,'GigabitEthernet0/0/0/1','dead:beef::2','64')
+    #xr_interfaces.set_if_ipv4_addr_eitf(conn,'GigabitEthernet0/0/0/0','10.0.0.1','24')
+    #xr_interfaces.del_if_ipv4_addr_eitf(conn,'GigabitEthernet0/0/0/0','10.0.0.1','24')
     xr_base.xr_commit(conn)
     xr_base.xr_disconnect(conn)
 

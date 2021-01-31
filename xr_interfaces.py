@@ -213,9 +213,9 @@ def delete_sub(conn,interface,sub):
     except Exception as e:
         print("sub interface deletion failed due to ",e)
     
-def set_if_ipv4_addr(conn,interface,address,mask):
+
 	config="""
-	<config>
+	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
 	<interface-configurations
 		xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ifmgr-cfg">
 		<interface-configuration>
@@ -241,7 +241,7 @@ def set_if_ipv4_addr(conn,interface,address,mask):
 def set_if_ipv4_addr_eitf(conn,interface,address,mask):
 	# verified on IOS-XR 6.1.3 on Jan 31, 2021
 	config="""
-	<config>
+	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
 	<interfaces xmlns="http://openconfig.net/yang/interfaces">
 	<interface>
 		<name>{0}</name>
@@ -271,11 +271,44 @@ def set_if_ipv4_addr_eitf(conn,interface,address,mask):
 	print(config)
 	conn.edit_config(target="candidate",config=config)
 
+def del_if_ipv4_addr_eitf(conn,interface,address,mask):
+	# verified on IOS-XR 6.1.3 on Jan 31, 2021
+	config="""
+	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+	<interfaces xmlns="http://openconfig.net/yang/interfaces" xc:operation="delete">
+	<interface>
+		<name>{0}</name>
+		<config>
+		<name>{0}</name>
+		<type xmlns:idx="urn:ietf:params:xml:ns:yang:iana-if-type">idx:ethernetCsmacd</type>
+		<enabled>true</enabled>
+		</config>
+		<subinterfaces>
+		<subinterface>
+		<index>0</index>
+		<ipv4 xmlns="http://openconfig.net/yang/interfaces/ip" xc:operation="delete">
+		<address xc:operation="delete">
+			<ip>{1}</ip>
+			<config>
+			<ip>{1}</ip>
+			<prefix-length>{2}</prefix-length>
+			</config>
+		</address>
+		</ipv4>
+		</subinterface>
+		</subinterfaces>
+	</interface>
+	</interfaces>
+	</config>
+	""".format(interface,address,mask)
+	print(config)
+	conn.edit_config(target="candidate",config=config)
+
 def set_if_ipv6_addr_eitf(conn,interface,address,mask):
 	# verified on IOS-XR 6.1.3 on Jan 31, 2021
 	config="""
 	<config>
-	<interfaces xmlns="http://openconfig.net/yang/interfaces">
+	<interfaces xmlns="http://openconfig.net/yang/interfaces" operation="replace">
 	<interface>
 		<name>{0}</name>
 		<config>
