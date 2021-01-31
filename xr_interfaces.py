@@ -214,26 +214,92 @@ def delete_sub(conn,interface,sub):
         print("sub interface deletion failed due to ",e)
     
 def set_if_ipv4_addr(conn,interface,address,mask):
-    config="""
-    <config>
-    <interface-configurations
-			xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ifmgr-cfg">
-			<interface-configuration>
-				<active>act</active>
-				<interface-name>{0}</interface-name>
-				<interface-virtual></interface-virtual>
-				<ipv4-network
-					xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-io-cfg">
-					<addresses>
-						<primary>
-							<address>{1}</address>
-							<netmask>{2}</netmask>
-						</primary>
-					</addresses>
-				</ipv4-network>
-			</interface-configuration>
-    </interface-configurations>
-    </config>
-    """.format(interface,address,mask)
-    print(config)
-    conn.edit_config(target="candidate",config=config)
+	config="""
+	<config>
+	<interface-configurations
+		xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ifmgr-cfg">
+		<interface-configuration>
+			<active>act</active>
+			<interface-name>{0}</interface-name>
+			<interface-virtual></interface-virtual>
+			<ipv4-network
+				xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-io-cfg">
+				<addresses>
+					<primary>
+						<address>{1}</address>
+						<netmask>{2}</netmask>
+					</primary>
+				</addresses>
+			</ipv4-network>
+		</interface-configuration>
+	</interface-configurations>
+	</config>
+	""".format(interface,address,mask)
+	print(config)
+	conn.edit_config(target="candidate",config=config)
+
+def set_if_ipv4_addr_eitf(conn,interface,address,mask):
+	# verified on IOS-XR 6.1.3 on Jan 31, 2021
+	config="""
+	<config>
+	<interfaces xmlns="http://openconfig.net/yang/interfaces">
+	<interface>
+		<name>{0}</name>
+		<config>
+		<name>{0}</name>
+		<type xmlns:idx="urn:ietf:params:xml:ns:yang:iana-if-type">idx:ethernetCsmacd</type>
+		<enabled>true</enabled>
+		</config>
+		<subinterfaces>
+		<subinterface>
+		<index>0</index>
+		<ipv4 xmlns="http://openconfig.net/yang/interfaces/ip">
+		<address>
+			<ip>{1}</ip>
+			<config>
+			<ip>{1}</ip>
+			<prefix-length>{2}</prefix-length>
+			</config>
+		</address>
+		</ipv4>
+		</subinterface>
+		</subinterfaces>
+	</interface>
+	</interfaces>
+	</config>
+	""".format(interface,address,mask)
+	print(config)
+	conn.edit_config(target="candidate",config=config)
+
+def set_if_ipv6_addr_eitf(conn,interface,address,mask):
+	# verified on IOS-XR 6.1.3 on Jan 31, 2021
+	config="""
+	<config>
+	<interfaces xmlns="http://openconfig.net/yang/interfaces">
+	<interface>
+		<name>{0}</name>
+		<config>
+		<name>{0}</name>
+		<type xmlns:idx="urn:ietf:params:xml:ns:yang:iana-if-type">idx:ethernetCsmacd</type>
+		<enabled>true</enabled>
+		</config>
+		<subinterfaces>
+		<subinterface>
+		<index>0</index>
+		<ipv6 xmlns="http://openconfig.net/yang/interfaces/ip">
+        <address>
+        <ip xmlns="http://openconfig.net/yang/interfaces">cafe::1</ip>
+        <config>
+        <ip>{1}</ip>
+        <prefix-length>{2}</prefix-length>
+        </config>
+        </address>
+        </ipv6>
+		</subinterface>
+		</subinterfaces>
+	</interface>
+	</interfaces>
+	</config>
+	""".format(interface,address,mask)
+	print(config)
+	conn.edit_config(target="candidate",config=config)

@@ -12,7 +12,9 @@ def main():
     logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
     
     conn=xr_base.xr_connect('XR1-AUTO', 830, 'ccie', 'ccieauto')
-    #xr_interfaces.get_interfaces(conn)
+    #xr_interfaces.get_interface(conn,'GigabitEthernet0/0/0/0')
+    xr_interfaces.set_if_ipv6_addr_eitf(conn,'GigabitEthernet0/0/0/1','dead:beef::2','64')
+    xr_base.xr_commit(conn)
     xr_base.xr_disconnect(conn)
 
 if __name__ == '__main__':
