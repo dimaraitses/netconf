@@ -38,4 +38,11 @@ def xr_disconnect(conn):
     except Exception as e:
         print("Failed to close connection due to ",e)
 
-
+def xr_full_config(conn):
+    try:
+       logging.info('Retrieving full config, please wait ...')
+       result = conn.get_config(source='running').xml
+       return(result)
+       logging.info(result)
+    except Exception as e:
+       logging.info('Faled to read config due to ')

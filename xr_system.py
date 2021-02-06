@@ -10,6 +10,7 @@ from ncclient import manager
 from ncclient.xml_ import *
 
 def set_hostname(conn,hostname):
+    # verified on 6.1.3 Feb 1 2021
     config="""
     <config>
     <host-names
@@ -24,8 +25,8 @@ def set_hostname(conn,hostname):
     except Exception as e:
         print("Failed to set hostname due to ",e)
     
-
 def delete_hostname(conn):
+    # verified on 6.1.3 Feb 1 2021
     config="""
     <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
     <host-names
@@ -35,7 +36,6 @@ def delete_hostname(conn):
     </config>
     """
     try:
-        print(config)
         conn.edit_config(target="candidate",config=config)
         print("Hostname deleted")
     except Exception as e:

@@ -3,6 +3,8 @@ import xmltodict
 import xr_base
 import xr_system
 import xr_interfaces
+import xr_isis
+import jinja_test
 
 from ncclient import manager
 from ncclient.xml_ import *
@@ -12,10 +14,10 @@ def main():
     logging.basicConfig(stream=sys.stdout, level=logging.ERROR, format=LOG_FORMAT)
     
     conn=xr_base.xr_connect('XR1-AUTO', 830, 'ccie', 'ccieauto')
-    #xr_interfaces.get_interface(conn,'GigabitEthernet0/0/0/0')
-    #xr_interfaces.set_if_ipv4_addr_eitf(conn,'GigabitEthernet0/0/0/0','10.0.0.1','24')
-    #xr_interfaces.del_if_ipv4_addr_eitf(conn,'GigabitEthernet0/0/0/0','10.0.0.1','24')
-    xr_base.xr_commit(conn)
+    #xr_isis.create_isis(conn,'POP-2','49.0000.0000.0001.00','level2')
+    full_conf=xr_base.xr_full_config(conn)
+    print(full_conf)
+    #xr_base.xr_commit(conn)
     xr_base.xr_disconnect(conn)
 
 if __name__ == '__main__':

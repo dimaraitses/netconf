@@ -88,7 +88,6 @@ def create_loopback(conn,index):
             </interfaces>
     </config>
     """.format(index)
-    print(config)
     conn.edit_config(target="candidate",config=config)
 
 def delete_loopback(conn,index):
@@ -110,7 +109,6 @@ def delete_loopback(conn,index):
             </interfaces>
     </config>
     """.format(index)
-    print(config)
     try:
         conn.edit_config(target="candidate",config=config)
         print("Loopback",index," deleted")
@@ -213,31 +211,6 @@ def delete_sub(conn,interface,sub):
     except Exception as e:
         print("sub interface deletion failed due to ",e)
     
-
-	config="""
-	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
-	<interface-configurations
-		xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ifmgr-cfg">
-		<interface-configuration>
-			<active>act</active>
-			<interface-name>{0}</interface-name>
-			<interface-virtual></interface-virtual>
-			<ipv4-network
-				xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-io-cfg">
-				<addresses>
-					<primary>
-						<address>{1}</address>
-						<netmask>{2}</netmask>
-					</primary>
-				</addresses>
-			</ipv4-network>
-		</interface-configuration>
-	</interface-configurations>
-	</config>
-	""".format(interface,address,mask)
-	print(config)
-	conn.edit_config(target="candidate",config=config)
-
 def set_if_ipv4_addr_eitf(conn,interface,address,mask):
 	# verified on IOS-XR 6.1.3 on Jan 31, 2021
 	config="""

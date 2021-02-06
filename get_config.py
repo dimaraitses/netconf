@@ -22,6 +22,7 @@ def connect(host, port, user, password):
     logging.info('Retrieving full config, please wait ...')
 
     result = conn.get_config(source='running').xml
+    print(result)
     logging.info(result)
 
     conn.close_session()
