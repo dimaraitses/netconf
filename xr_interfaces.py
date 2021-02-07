@@ -216,7 +216,7 @@ def set_if_ipv4_addr_eitf(conn,interface,address,mask):
 	config="""
 	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
 	<interfaces xmlns="http://openconfig.net/yang/interfaces">
-	<interface>
+	<interface xc:operation="replace">
 		<name>{0}</name>
 		<config>
 		<name>{0}</name>
@@ -227,7 +227,7 @@ def set_if_ipv4_addr_eitf(conn,interface,address,mask):
 		<subinterface>
 		<index>0</index>
 		<ipv4 xmlns="http://openconfig.net/yang/interfaces/ip">
-		<address>
+		<address xc:operation="replace">
 			<ip>{1}</ip>
 			<config>
 			<ip>{1}</ip>
@@ -306,6 +306,34 @@ def set_if_ipv6_addr_eitf(conn,interface,address,mask):
 		</subinterfaces>
 	</interface>
 	</interfaces>
+	</config>
+	""".format(interface,address,mask)
+	print(config)
+	conn.edit_config(target="candidate",config=config)
+
+def set_if_ipv4_addr_cisco(conn,interface,address,mask):
+	# 
+	# verified on cisco ios-xr 6.1.3
+	# correctly _replaces_ the primary ipv4 address
+	# note xc:operation="replace" at the "primary"
+	#
+	#
+	config="""
+	<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+	<interface-configurations xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ifmgr-cfg">
+    <interface-configuration>
+    <active>act</active>
+    <interface-name>{0}</interface-name>
+    <ipv4-network xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-io-cfg">
+     <addresses>
+      <primary xc:operation="replace">
+       <address>{1}</address>
+       <netmask>{2}</netmask>
+      </primary>
+     </addresses>
+    </ipv4-network>
+    </interface-configuration>
+    </interface-configurations>
 	</config>
 	""".format(interface,address,mask)
 	print(config)

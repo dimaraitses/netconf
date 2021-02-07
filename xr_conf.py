@@ -15,9 +15,11 @@ def main():
     
     conn=xr_base.xr_connect('XR1-AUTO', 830, 'ccie', 'ccieauto')
     #xr_isis.create_isis(conn,'POP-2','49.0000.0000.0001.00','level2')
-    full_conf=xr_base.xr_full_config(conn)
-    print(full_conf)
-    #xr_base.xr_commit(conn)
+    #full_conf=xr_base.xr_full_config(conn)
+    #print(full_conf)
+    #xr_interfaces.set_if_ipv4_addr_eitf(conn,'GigabitEthernet0/0/0/0','100.0.0.1','24')
+    xr_interfaces.set_if_ipv4_addr_cisco(conn,'GigabitEthernet0/0/0/0','200.0.0.1','255.255.255.0')
+    xr_base.xr_commit(conn)
     xr_base.xr_disconnect(conn)
 
 if __name__ == '__main__':
